@@ -1,5 +1,10 @@
-fork
-=====
+cryptop
+=======
+cryptop is a lightweight command line based cryptocurrency portfolio.
+Built on Python 3 and ncurses with simplicity in mind, cryptop updates in realtime.
+
+.. image:: img\cryptop.png
+
 I forked this repo from https://github.com/huwwp/cryptop in order to change a few things.
 
 The cryptocompare api was not updating the price of the most superior of all cryptocurrencies, Raiblocks (XRB)
@@ -12,13 +17,6 @@ by updating the wallet > web setting in the config.ini.
 
 A note: github gists send text, save your gist without an extension and with no spaces in the raw text, an example gist
 is provided with 1 BTC as an example.
-
-cryptop
-=======
-cryptop is a lightweight command line based cryptocurrency portfolio.
-Built on Python 3 and ncurses with simplicity in mind, cryptop updates in realtime.
-
-.. image:: img\cryptop.png
 
 Installation
 ------------
