@@ -15,9 +15,10 @@ from forex_python.converter import CurrencyRates
 
 # GLOBALS!
 BASEDIR = os.path.join(os.path.expanduser('~'), '.cryptop')
-DATAFILE = os.path.join(BASEDIR, 'wallet.json')
 CONFFILE = os.path.join(BASEDIR, 'config.ini')
 CONFIG = configparser.ConfigParser()
+DATAFILE = os.path.join(BASEDIR, 'wallet.json')
+
 COIN_FORMAT = re.compile('[A-Z]{2,5},\d{0,}\.?\d{0,}')
 
 SORT_FNS = {
@@ -225,6 +226,12 @@ def write_scr(stdscr, wallet, y, x):
 
 def read_wallet():
     ''' Reads the wallet data from its json file '''
+    if WEBWALLET:
+        wallet_json = requests.get(WEBWALLET).json()
+        print (wallet_json)
+
+        return wallet_json
+
     try:
         with open(DATAFILE, 'r') as f:
             return json.load(f)
@@ -236,6 +243,8 @@ def read_wallet():
 
 def write_wallet(wallet):
     ''' Write wallet data to its json file '''
+    if WEBWALLET:
+        return
     with open(DATAFILE, 'w') as f:
         json.dump(wallet, f)
 
@@ -328,12 +337,15 @@ def mainc(stdscr):
                 COLUMN = (COLUMN + 1) % len(SORTS)
 
 def main():
+
     if os.path.isfile(BASEDIR):
         sys.exit('Please remove your old configuration file at {}'.format(BASEDIR))
     os.makedirs(BASEDIR, exist_ok=True)
 
     global CONFIG
+    global WEBWALLET
     CONFIG = read_configuration(CONFFILE)
+    WEBWALLET = CONFIG['wallet'].get('web', None)
     locale.setlocale(locale.LC_MONETARY, CONFIG['locale'].get('monetary', ''))
 
     requests_cache.install_cache(cache_name='api_cache', backend='memory',
