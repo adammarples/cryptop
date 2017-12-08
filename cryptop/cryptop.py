@@ -194,8 +194,8 @@ def write_scr(stdscr, wallet, y, x):
 
     total = 0
 
-    if wallet:
-        coinl = list(wallet.keys())
+    coinl = list(wallet.keys())
+    if coinl:
         coinvl = get_price(coinl)
         heldl = [wallet[x] for x in coinl]
 
