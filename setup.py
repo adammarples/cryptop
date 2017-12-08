@@ -7,8 +7,8 @@ with open('README.rst', encoding="utf-8") as f:
     readme = f.read()
 
 setup(
-    name='cryptop_rai',
-    version='0.2.0',
+    name='cryptop',
+    version='0.2.1',
     description='Command line Cryptocurrency Portfolio',
     long_description=readme,
     author='huwwp',
@@ -21,7 +21,7 @@ setup(
         "Programming Language :: Python :: 3",
     ],
     packages=find_packages(),
-    install_requires=['requests', 'requests_cache'],
+    install_requires=['requests', 'requests_cache', 'forex_python'],
     package_data={'cryptop': ['config.ini']},
     entry_points = {
         'console_scripts': ['cryptop = cryptop.cryptop:main'],
