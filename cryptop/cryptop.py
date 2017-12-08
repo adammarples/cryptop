@@ -105,12 +105,9 @@ def get_price(coins, curr=None, url='https://api.coinmarketcap.com/v1/ticker/'):
 
     curr = curr or CONFIG['api'].get('currency', 'USD').upper()
 
-    coin_data = []
-    for coin in coins:
-        for dic in data:
-            if dic['symbol'] == coin:
-                dic = build_currency(dic, curr)
-                coin_data.append(dic)
+    data = {x.pop('symbol'): x for x in data}
+
+    coin_data = [build_currency(data[coin], curr) for coin in coins]
 
     coin_data_list = [
         (
@@ -196,19 +193,18 @@ def write_scr(stdscr, wallet, y, x):
         stdscr.addnstr(1, 0, header, x, curses.color_pair(3))
 
     total = 0
-    coinl = list(wallet.keys())
-    heldl = list(wallet.values())
-    if coinl:
+
+    if wallet:
+        coinl = list(wallet.keys())
         coinvl = get_price(coinl)
+        heldl = [wallet[x] for x in coinl]
 
         if y > 3:
             s = sorted(list(zip(coinl, coinvl, heldl)), key=SORT_FNS[SORTS[COLUMN]], reverse=ORDER)
             coinl = list(x[0] for x in s)
             coinvl = list(x[1] for x in s)
             heldl = list(x[2] for x in s)
-            print (coinl, coinvl, heldl)
             for coin, val, held in zip(coinl, coinvl, heldl):
-                print (coin, val, held)
                 if coinl.index(coin) + 2 < y:
                     stdscr.addnstr(coinl.index(coin) + 2, 0,
                     str_formatter(coin, val, held), x, curses.color_pair(2))
