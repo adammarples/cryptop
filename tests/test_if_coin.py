@@ -18,16 +18,14 @@ class TestIf_coin(TestCase):
         side_effect = lambda x, y: {'dec_places': 2, 'field_length': 13}[x]
         theme = Mock()
         theme.getint = MagicMock(side_effect=side_effect)
-        CONFIG = {'theme': theme, 'api': {'currency': 'USD'}}
+        CONFIG = {'theme': theme, 'api': {'currency': 'USD'}, 'locale': {'monetary': 'en_US.UTF-8'}}
         cryptop.CONFIG = CONFIG
         curses = Mock()
         curses.color_pair = MagicMock(return_value=None)
         cryptop.curses = curses
         stdscr = Mock()
         stdscr.addnstr = MagicMock(return_value=None)
-        wallet = Mock()
-        wallet.keys = MagicMock(return_value=['BTC', 'ETH', 'XRB'])
-        wallet.values = MagicMock(return_value=[100, 200, 300])
-        locale.setlocale(locale.LC_MONETARY, 'en_CA.UTF-8')
+        wallet = {'BTC': '100'}
+        locale.setlocale(locale.LC_MONETARY, CONFIG['locale'].get('monetary', ''))
         cryptop.locale = locale
         cryptop.write_scr(stdscr, wallet, 1920, 1080)
