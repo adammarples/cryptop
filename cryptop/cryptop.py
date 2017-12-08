@@ -11,6 +11,8 @@ import locale
 import requests
 import requests_cache
 
+from forex_python.converter import CurrencyRates
+
 # GLOBALS!
 BASEDIR = os.path.join(os.path.expanduser('~'), '.cryptop')
 DATAFILE = os.path.join(BASEDIR, 'wallet.json')
@@ -18,10 +20,12 @@ CONFFILE = os.path.join(BASEDIR, 'config.ini')
 CONFIG = configparser.ConfigParser()
 COIN_FORMAT = re.compile('[A-Z]{2,5},\d{0,}\.?\d{0,}')
 
-SORT_FNS = { 'coin' : lambda item: item[0],
-             'price': lambda item: float(item[1][0]),
-             'held' : lambda item: float(item[2]),
-             'val'  : lambda item: float(item[1][0]) * float(item[2]) }
+SORT_FNS = {
+    'coin' : lambda item: item[0],
+    'price': lambda item: float(item[1][0]),
+    'held' : lambda item: float(item[2]),
+    'val'  : lambda item: float(item[1][0]) * float(item[2])
+}
 SORTS = list(SORT_FNS.keys())
 COLUMN = SORTS.index('val')
 ORDER = True
@@ -50,28 +54,88 @@ def read_configuration(confpath):
     return CONFIG
 
 
-def if_coin(coin, url='https://www.cryptocompare.com/api/data/coinlist/'):
+def if_coin(coin, url='https://api.coinmarketcap.com/v1/ticker/'):
     '''Check if coin exists'''
-    return coin in requests.get(url).json()['Data']
+    data = requests.get(url).json()
+    return coin in [x['symbol'] for x in data]
 
 
-def get_price(coin, curr=None):
-    '''Get the data on coins'''
-    curr = curr or CONFIG['api'].get('currency', 'USD')
-    fmt = 'https://min-api.cryptocompare.com/data/pricemultifull?fsyms={}&tsyms={}'
+def get_price(coins, curr=None, url='https://api.coinmarketcap.com/v1/ticker/'):
+    """
+    get the price data
 
+    api returns list of dicts for all coins like
+
+    [
+        {
+            "id": "bitcoin",
+            "name": "Bitcoin",
+            "symbol": "BTC",
+            "rank": "1",
+            "price_usd": "14751.6",
+            "price_btc": "1.0",
+            "24h_volume_usd": "21974500000.0",
+            "market_cap_usd": "246760708110",
+            "available_supply": "16727725.0",
+            "total_supply": "16727725.0",
+            "max_supply": "21000000.0",
+            "percent_change_1h": "-6.49",
+            "percent_change_24h": "-3.45",
+            "percent_change_7d": "43.54",
+            "last_updated": "1512733154"
+        },
+
+        {...},
+
+    ]
+
+
+    :param coins: str, len 3 ISO symbol ie. 'BTC'
+    :param curr: str, len 3 ISO symbol ie. 'USD'
+    :param url: str, API request url
+    :return: list of price in curr, hi, lo for coin in coins
+
+    """
     try:
-        r = requests.get(fmt.format(coin, curr))
+        r = requests.get(url)
+        data = r.json()
     except requests.exceptions.RequestException:
         sys.exit('Could not complete request')
 
-    try:
-        data_raw = r.json()['RAW']
-        return [(data_raw[c][curr]['PRICE'],
-                data_raw[c][curr]['HIGH24HOUR'],
-                data_raw[c][curr]['LOW24HOUR']) for c in coin.split(',') if c in data_raw.keys()]
-    except:
-        sys.exit('Could not parse data')
+    curr = curr or CONFIG['api'].get('currency', 'USD').upper()
+
+    coin_data = []
+    for coin in coins:
+        for dic in data:
+            if dic['symbol'] == coin:
+                dic = build_currency(dic, curr)
+                coin_data.append(dic)
+
+    coin_data_list = [
+        (
+            coin['price'][curr],
+            float(coin['percent_change_1h']),
+            float(coin['percent_change_24h']),
+        ) for coin in coin_data
+    ]
+
+    return coin_data_list
+
+
+
+def build_currency(dic, curr):
+    """make a sub-dict with price conversions"""
+    usd = float(dic.pop('price_usd'))
+    dic['price'] = {
+        'USD': usd,
+        curr: convert_currency(usd, curr),
+    }
+    return dic
+
+def convert_currency(usd, curr):
+    if curr == 'USD':
+        return usd
+    return usd * CurrencyRates().get_rates('USD')[curr]
 
 
 def get_theme_colors():
@@ -110,37 +174,46 @@ def str_formatter(coin, val, held):
         locale.currency(val[0], grouping=True)[:max_length], avg_length,
         held_str[:max_length],
         locale.currency(float(held) * val[0], grouping=True)[:max_length], avg_length,
-        locale.currency(val[1], grouping=True)[:max_length], avg_length,
-        locale.currency(val[2], grouping=True)[:max_length], avg_length)
+        # locale.currency(val[1], grouping=True)[:max_length], avg_length,
+        # locale.currency(val[2], grouping=True)[:max_length], avg_length,
+        str(val[1])+'%', avg_length,
+        str(val[2]) + '%', avg_length,
+    )
 
 def write_scr(stdscr, wallet, y, x):
     '''Write text and formatting to screen'''
-    first_pad = '{:>{}}'.format('', CONFIG['theme'].getint('dec_places', 2) + 10 - 3)
-    second_pad = ' ' * (CONFIG['theme'].getint('field_length', 13) - 2)
-    third_pad =  ' ' * (CONFIG['theme'].getint('field_length', 13) - 3)
+    pad1 = '{:>{}}'.format('', CONFIG['theme'].getint('dec_places', 2) + 10 - 3)
+    pad2 = ' ' * (CONFIG['theme'].getint('field_length', 13) - 2)
+    pad3 =  ' ' * (CONFIG['theme'].getint('field_length', 13) - 3)
+    pad4 = ' ' * (CONFIG['theme'].getint('field_length', 13) - 6)
+    pad5 = ' ' * (CONFIG['theme'].getint('field_length', 13) - 6)
 
     if y >= 1:
         stdscr.addnstr(0, 0, 'cryptop v0.2.0', x, curses.color_pair(2))
     if y >= 2:
-        header = '  COIN{}PRICE{}HELD {}VAL{}HIGH {}LOW  '.format(first_pad, second_pad, third_pad, first_pad, first_pad)
+        header = '  COIN{}PRICE{}HELD {}VAL{}1 HR {}24 HR %  '.format(pad1, pad2, pad3, pad4, pad5)
         stdscr.addnstr(1, 0, header, x, curses.color_pair(3))
 
     total = 0
     coinl = list(wallet.keys())
     heldl = list(wallet.values())
     if coinl:
-        coinvl = get_price(','.join(coinl))
+        coinvl = get_price(coinl)
 
         if y > 3:
             s = sorted(list(zip(coinl, coinvl, heldl)), key=SORT_FNS[SORTS[COLUMN]], reverse=ORDER)
             coinl = list(x[0] for x in s)
             coinvl = list(x[1] for x in s)
             heldl = list(x[2] for x in s)
+            print (coinl, coinvl, heldl)
             for coin, val, held in zip(coinl, coinvl, heldl):
+                print (coin, val, held)
                 if coinl.index(coin) + 2 < y:
                     stdscr.addnstr(coinl.index(coin) + 2, 0,
                     str_formatter(coin, val, held), x, curses.color_pair(2))
                 total += float(held) * val[0]
+
+
 
     if y > len(coinl) + 3:
         stdscr.addnstr(y - 2, 0, 'Total Holdings: {:10}    '

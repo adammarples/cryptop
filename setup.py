@@ -7,7 +7,7 @@ with open('README.rst', encoding="utf-8") as f:
     readme = f.read()
 
 setup(
-    name='cryptop',
+    name='cryptop_rai',
     version='0.2.0',
     description='Command line Cryptocurrency Portfolio',
     long_description=readme,
