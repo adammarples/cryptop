@@ -1,3 +1,18 @@
+fork
+=====
+I forked this repo from https://github.com/huwwp/cryptop in order to change a few things.
+
+The cryptocompare api was not updating the price of the most superior of all cryptocurrencies, Raiblocks (XRB)
+so i have changed the API to coinmarketcap.
+
+This API doesn't provide price HI/LOW so I have also changed the outputs to 1HR change and 24HR, which I prefer.
+
+I have also added the functionality to read your wallet.json from a github gist (or any enpoint which delivers json)
+by updating the wallet > web setting in the config.ini.
+
+A note: github gists send text, save your gist without an extension and with no spaces in the raw text, an example gist
+is provided with 1 BTC as an example.
+
 cryptop
 =======
 cryptop is a lightweight command line based cryptocurrency portfolio.
@@ -10,19 +25,7 @@ Installation
 
 cryptop requires Python 3 to run, and has only been tested in Python 3.6 so far.
 
-The easiest way to install cryptop is through pip
-
-.. code:: bash
-
-    sudo pip install cryptop
-    
-You may need to force pip3 depending on your python install
-
-.. code:: bash
-
-    sudo pip3 install cryptop
-
-cryptop can be installed manually, download the repo and run
+This fork of cryptop is not on pip yet, it can be installed manually, download the repo and run
 
 .. code:: bash
 
@@ -49,24 +52,23 @@ Cryptop creates two config files in a .cryptop folder in your home directory.
 .crypto/config.ini contains theme configuration (text/background colors) and
 options to change the output currency (default USD), update frequency, number of decimal places to display and maximum width for float values.
 
-.. image:: img\fall.png
-
-.. image:: img\aesth.png
-
 .cryptop/wallet.json contains the coins and amounts you hold, you shouldn't need to edit it manually
+
+adding a github gist json file under [wallet] web= in the config will allow you to read your wallet from a gist json
+now you can update your wallet.json without the application!
+
+This gist will not be possible to update however in the cryptop terminal.
 
 Credits
 -------
 
-Uses the `cryptocompare.com API
-<http://www.cryptocompare.com/>`_.
+Uses the coinmarketcap.com API
 
 Tipjar
 ------
 
-Help me reach my goal of becoming a blockchain developer.
-
-BTC: 15wNW29q7XAEbC8yus49CWvt91JkhcdkoW
+BTC: 15wNW29q7XAEbC8yus49CWvt91JkhcdkoW  <- original dev's wallet
+XRB: xrb_1pgig4p4wp9ykuz3soxnarfzpjardpampjb3ihrsrftumfmfbiwiuxkhzm59 <- my raiblocks wallet
 
 Disclaimer
 ----------
