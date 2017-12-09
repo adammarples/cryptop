@@ -27,9 +27,19 @@ This fork of cryptop is not on pip yet, it can be installed manually, download t
 
 .. code:: bash
 
+    pip install git+https://github.com/adammarples/cryptop.git
+
+or
+
+.. code:: bash
+
     sudo python setup.py install
 
 pip and setup.py can be run with a --user flag if you would prefer not to sudo. Both require setuptools which is included in most python installs and many distros by default
+
+Windows doesn't have curses installed so download the .whl for your version and install it with pip
+
+https://www.lfd.uci.edu/~gohlke/pythonlibs/#curses
 
 Usage
 -----
