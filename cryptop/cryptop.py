@@ -340,7 +340,8 @@ def main():
     global WEBWALLET
     CONFIG = read_configuration(CONFFILE)
     WEBWALLET = CONFIG['wallet'].get('web', None)
-    locale.setlocale(locale.LC_MONETARY, CONFIG['locale'].get('monetary', 'en_US.UTF-8'))
+    mylocale = CONFIG['locale'].get('currency', 'USA')
+    locale.setlocale(category=locale.LC_ALL, locale=mylocale)
     requests_cache.install_cache(cache_name='api_cache', backend='memory',
         expire_after=int(CONFIG['api'].get('cache', 10)))
 

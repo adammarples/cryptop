@@ -11,7 +11,9 @@ class TestIf_coin(TestCase):
         theme = Mock()
         theme.getint = MagicMock(side_effect=side_effect)
         self.CONFIG = {'theme': theme, 'api': {
-            'currency': 'USD'}, 'locale': {'monetary': 'en_US.UTF-8'}}
+            'currency': 'USD'}, 'locale': {'currency': 'USA'}}
+        self.locale = locale
+        self.locale.setlocale(category=locale.LC_ALL, locale='USA')
             
     def test_if_coin(self):
         assert cryptop.if_coin('BTC', url='https://api.coinmarketcap.com/v1/ticker/')
@@ -29,10 +31,13 @@ class TestIf_coin(TestCase):
         stdscr = Mock()
         stdscr.addnstr = MagicMock(return_value=None)
         wallet = {'BTC': '100'}
-        locale.setlocale(locale.LC_MONETARY, CONFIG['locale'].get('monetary', ''))
-        cryptop.locale = locale
+        cryptop.locale = self.locale
         cryptop.write_scr(stdscr, wallet, 1920, 1080)
 
     def test_str_formatter(self):
+        locale.setlocale(locale.LC_MONETARY,
+                         self.CONFIG['locale'].get('currency', 'USA'))
+        cryptop.locale = self.locale
+        cryptop.CONFIG = self.CONFIG
         out = cryptop.str_formatter('BTC', [100, 3.2, 2.3], 6)
         print (out)
