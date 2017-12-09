@@ -77,6 +77,7 @@ Tipjar
 ------
 
 BTC: 15wNW29q7XAEbC8yus49CWvt91JkhcdkoW  <- original dev's wallet
+
 XRB: xrb_1pgig4p4wp9ykuz3soxnarfzpjardpampjb3ihrsrftumfmfbiwiuxkhzm59 <- my raiblocks wallet
 
 Disclaimer
