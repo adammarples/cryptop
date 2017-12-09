@@ -172,10 +172,8 @@ def str_formatter(coin, val, held):
         locale.currency(val[0], grouping=True)[:max_length], avg_length,
         held_str[:max_length],
         locale.currency(float(held) * val[0], grouping=True)[:max_length], avg_length,
-        # locale.currency(val[1], grouping=True)[:max_length], avg_length,
-        # locale.currency(val[2], grouping=True)[:max_length], avg_length,
         str(val[1])+'%', avg_length,
-        str(val[2]) + '%', avg_length,
+        str(val[2])+'%', avg_length,
     )
 
 def write_scr(stdscr, wallet, y, x):
