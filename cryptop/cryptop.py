@@ -13,7 +13,6 @@ import requests_cache
 
 from forex_python.converter import CurrencyRates
 
-# GLOBALS!
 BASEDIR = os.path.join(os.path.expanduser('~'), '.cryptop')
 CONFFILE = os.path.join(BASEDIR, 'config.ini')
 CONFIG = configparser.ConfigParser()
@@ -340,7 +339,8 @@ def main():
     global WEBWALLET
     CONFIG = read_configuration(CONFFILE)
     WEBWALLET = CONFIG['wallet'].get('web', None)
-    mylocale = CONFIG['locale'].get('currency', 'USA')
+
+    mylocale = CONFIG['locale'].get('locale', 'us_us')
     locale.setlocale(category=locale.LC_ALL, locale=mylocale)
     requests_cache.install_cache(cache_name='api_cache', backend='memory',
         expire_after=int(CONFIG['api'].get('cache', 10)))
