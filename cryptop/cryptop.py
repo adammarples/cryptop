@@ -6,12 +6,11 @@ import shutil
 import configparser
 import json
 import pkg_resources
-import locale
 
 import requests
 import requests_cache
 
-from forex_python.converter import CurrencyRates
+from forex_python.converter import CurrencyRates, CurrencyCodes
 
 BASEDIR = os.path.join(os.path.expanduser('~'), '.cryptop')
 CONFFILE = os.path.join(BASEDIR, 'config.ini')
@@ -160,6 +159,9 @@ def conf_scr():
     curses.init_pair(3, banner_text, banner)
     curses.halfdelay(10)
 
+def fmt_curr_string(value):
+    return '{0}{1:.2f}'.format(XE, value)
+
 def str_formatter(coin, val, held):
     '''Prepare the coin strings as per ini length/decimal place values'''
     max_length = CONFIG['theme'].getint('field_length', 13)
@@ -168,9 +170,9 @@ def str_formatter(coin, val, held):
     held_str = '{:>{},.8f}'.format(float(held), max_length)
     val_str = '{:>{},.{}f}'.format(float(held) * val[0], max_length, dec_place)
     return '  {:<5} {:>{}}  {} {:>{}} {:>{}} {:>{}}'.format(coin,
-        locale.currency(val[0], grouping=True)[:max_length], avg_length,
+        fmt_curr_string(val[0])[:max_length], avg_length,
         held_str[:max_length],
-        locale.currency(float(held) * val[0], grouping=True)[:max_length], avg_length,
+        fmt_curr_string(float(held) * val[0])[:max_length], avg_length,
         str(val[1])+'%', avg_length,
         str(val[2])+'%', avg_length,
     )
@@ -211,7 +213,7 @@ def write_scr(stdscr, wallet, y, x):
 
     if y > len(coinl) + 3:
         stdscr.addnstr(y - 2, 0, 'Total Holdings: {:10}    '
-            .format(locale.currency(total, grouping=True)), x, curses.color_pair(3))
+            .format(fmt_curr_string(total)), x, curses.color_pair(3))
         stdscr.addnstr(y - 1, 0,
             '[A] Add/update coin [R] Remove coin [S] Sort [C] Cycle sort [0\Q]Exit', x,
             curses.color_pair(2))
@@ -221,10 +223,7 @@ def read_wallet():
     ''' Reads the wallet data from its json file '''
     if WEBWALLET:
         wallet_json = requests.get(WEBWALLET).json()
-        print (wallet_json)
-
         return wallet_json
-
     try:
         with open(DATAFILE, 'r') as f:
             return json.load(f)
@@ -337,14 +336,14 @@ def main():
 
     global CONFIG
     global WEBWALLET
+    global CURRENCY
+    global XE
     CONFIG = read_configuration(CONFFILE)
     WEBWALLET = CONFIG['wallet'].get('web', None)
-
-    mylocale = CONFIG['locale'].get('locale', 'us_us')
-    locale.setlocale(category=locale.LC_ALL, locale=mylocale)
+    CURRENCY = CONFIG['api'].get('currency', 'USD')
+    XE = CurrencyCodes().get_symbol(CURRENCY)
     requests_cache.install_cache(cache_name='api_cache', backend='memory',
         expire_after=int(CONFIG['api'].get('cache', 10)))
-
     curses.wrapper(mainc)
 
 
