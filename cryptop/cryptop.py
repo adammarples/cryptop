@@ -13,8 +13,6 @@ import requests_cache
 from babel import numbers
 from currency_converter import CurrencyConverter
 
-from forex_python.converter import CurrencyRates, CurrencyCodes
-
 BASEDIR = os.path.join(os.path.expanduser('~'), '.cryptop')
 CONFFILE = os.path.join(BASEDIR, 'config.ini')
 CONFIG = configparser.ConfigParser()
