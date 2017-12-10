@@ -16,9 +16,14 @@ class TestIf_coin(TestCase):
         assert cryptop.if_coin('BTC', url='https://api.coinmarketcap.com/v1/ticker/')
 
     def test_get_price(self):
+        cryptop.CURRENCY = 'USD'
         coins = ['BTC', 'ETHOS', 'ETH', 'NEO']
-        data = cryptop.get_price(coins, curr='USD')
+        data = cryptop.get_price(coins)
         print (data)
+        cryptop.CURRENCY = 'GBP'
+        coins = ['BTC', 'ETHOS', 'ETH', 'NEO']
+        data = cryptop.get_price(coins)
+        print(data)
 
     def test_write(self):
         cryptop.CONFIG = self.CONFIG

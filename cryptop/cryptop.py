@@ -10,6 +10,9 @@ import pkg_resources
 import requests
 import requests_cache
 
+from babel import numbers
+from currency_converter import CurrencyConverter
+
 from forex_python.converter import CurrencyRates, CurrencyCodes
 
 BASEDIR = os.path.join(os.path.expanduser('~'), '.cryptop')
@@ -59,7 +62,7 @@ def if_coin(coin, url='https://api.coinmarketcap.com/v1/ticker/'):
     return coin in [x['symbol'] for x in data]
 
 
-def get_price(coins, curr=None, url='https://api.coinmarketcap.com/v1/ticker/'):
+def get_price(coins, url='https://api.coinmarketcap.com/v1/ticker/'):
     """
     get the price data
 
@@ -101,15 +104,13 @@ def get_price(coins, curr=None, url='https://api.coinmarketcap.com/v1/ticker/'):
     except requests.exceptions.RequestException:
         sys.exit('Could not complete request')
 
-    curr = curr or CONFIG['api'].get('currency', 'USD').upper()
-
     data = {x.pop('symbol'): x for x in data}
 
-    coin_data = [build_currency(data[coin], curr) for coin in coins]
+    coin_data = [build_currency(data[coin]) for coin in coins]
 
     coin_data_list = [
         (
-            coin['price'][curr],
+            coin['price'][CURRENCY],
             float(coin['percent_change_1h']),
             float(coin['percent_change_24h']),
         ) for coin in coin_data
@@ -117,21 +118,19 @@ def get_price(coins, curr=None, url='https://api.coinmarketcap.com/v1/ticker/'):
 
     return coin_data_list
 
-
-
-def build_currency(dic, curr):
+def build_currency(dic):
     """make a sub-dict with price conversions"""
     usd = float(dic.pop('price_usd'))
     dic['price'] = {
         'USD': usd,
-        curr: convert_currency(usd, curr),
+        CURRENCY: convert_currency(usd),
     }
     return dic
 
-def convert_currency(usd, curr):
-    if curr == 'USD':
+def convert_currency(usd):
+    if CURRENCY == 'USD':
         return usd
-    return usd * CurrencyRates().get_rates('USD')[curr]
+    return CurrencyConverter().convert(usd, 'USD', CURRENCY)
 
 
 def get_theme_colors():
@@ -160,7 +159,7 @@ def conf_scr():
     curses.halfdelay(10)
 
 def fmt_curr_string(value):
-    return '{0}{1:.2f}'.format(XE, value)
+    return numbers.format_currency(value, CURRENCY, locale='en')
 
 def str_formatter(coin, val, held):
     '''Prepare the coin strings as per ini length/decimal place values'''
@@ -337,11 +336,9 @@ def main():
     global CONFIG
     global WEBWALLET
     global CURRENCY
-    global XE
     CONFIG = read_configuration(CONFFILE)
     WEBWALLET = CONFIG['wallet'].get('web', None)
     CURRENCY = CONFIG['api'].get('currency', 'USD')
-    XE = CurrencyCodes().get_symbol(CURRENCY)
     requests_cache.install_cache(cache_name='api_cache', backend='memory',
         expire_after=int(CONFIG['api'].get('cache', 10)))
     curses.wrapper(mainc)

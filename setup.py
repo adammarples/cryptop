@@ -21,7 +21,7 @@ setup(
         "Programming Language :: Python :: 3",
     ],
     packages=find_packages(),
-    install_requires=['requests', 'requests_cache', 'forex_python'],
+    install_requires=['requests', 'requests_cache', 'babel', 'currencyconverter'],
     package_data={'cryptop': ['config.ini']},
     entry_points = {
         'console_scripts': ['cryptop = cryptop.cryptop:main'],
