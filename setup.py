@@ -12,8 +12,8 @@ setup(
     description='Command line Cryptocurrency Portfolio',
     long_description=readme,
     author='huwwp',
-    author_email='hpigott@gmail.com',
-    url='https://github.com/huwwp/cryptop',
+    author_email='adammarples@gmail.com',
+    url='https://github.com/adammarples/cryptop',
     license='MIT',
     keywords='crypto cli portfolio curses cryptocurrency bitcoin',
     classifiers = [
