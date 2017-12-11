@@ -2,9 +2,11 @@
 
 from setuptools import setup, find_packages
 
-
 with open('README.rst', encoding="utf-8") as f:
     readme = f.read()
+
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()
 
 setup(
     name='cryptop',
@@ -21,7 +23,7 @@ setup(
         "Programming Language :: Python :: 3",
     ],
     packages=find_packages(),
-    install_requires=['requests', 'requests_cache', 'babel', 'currencyconverter'],
+    install_requires=requirements,
     package_data={'cryptop': ['config.ini']},
     entry_points = {
         'console_scripts': ['cryptop = cryptop.cryptop:main'],
