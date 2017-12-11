@@ -13,7 +13,6 @@ so i have changed the API to coinmarketcap.
 This API doesn't provide price HI/LOW so I have also changed the outputs to 1HR change and 24HR, which I prefer.
 
 I have also added the functionality to read your wallet.json from a github gist (or any enpoint which delivers json)
-by updating the wallet > web setting in the config.ini.
 
 A note: github gists send text, save your gist without an extension and with no spaces in the raw text, an example gist
 is provided with 1 BTC as an example.
@@ -50,6 +49,18 @@ Start from a terminal.
 .. code:: bash
 
     cryptop
+
+Point at a web-based json file.
+
+.. code:: bash
+
+    cryptop --webwallet https://gist.githubusercontent.com/adammarples/a70a80d69631ebce1f8be9d2c06dfa38/raw/b0d97ca79d1208fe6ae976ada383a424a1e8adfa/wallet
+
+Specify your currency (defaults to USD).
+
+.. code:: bash
+
+    cryptop --currency GBP
 
 Follow the on screen instructions to add/remove cryptocurrencies from your portfolio.
 
