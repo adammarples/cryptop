@@ -6,6 +6,7 @@ import shutil
 import configparser
 import json
 import pkg_resources
+import argparse
 
 import requests
 import requests_cache
@@ -334,9 +335,36 @@ def main():
     global CONFIG
     global WEBWALLET
     global CURRENCY
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--webwallet',
+                        dest='webwallet',
+                        const='',
+                        default='',
+                        action='store',
+                        nargs='?',
+                        type=str,
+                        help='web address of wallet.json')
+    
+    parser.add_argument('--currency',
+                        dest='currency',
+                        const='USD',
+                        default='USD',
+                        action='store',
+                        nargs='?',
+                        type=str,
+                        help='curency to convert to')
+
+    args = parser.parse_args()
+
+    WEBWALLET = args.webwallet
+    CURRENCY = args.currency
+    print (WEBWALLET)
+    print (CURRENCY)
+    sys.exit()
+
     CONFIG = read_configuration(CONFFILE)
-    WEBWALLET = CONFIG['wallet'].get('web', None)
-    CURRENCY = CONFIG['api'].get('currency', 'USD')
     requests_cache.install_cache(cache_name='api_cache', backend='memory',
         expire_after=int(CONFIG['api'].get('cache', 10)))
     curses.wrapper(mainc)
