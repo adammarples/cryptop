@@ -56,6 +56,8 @@ Point at a web-based json file.
 
     cryptop --webwallet https://gist.githubusercontent.com/adammarples/a70a80d69631ebce1f8be9d2c06dfa38/raw/b0d97ca79d1208fe6ae976ada383a424a1e8adfa/wallet
 
+This gist will not be possible to update however in the cryptop terminal.
+
 Specify your currency (defaults to USD).
 
 .. code:: bash
@@ -73,11 +75,6 @@ Cryptop creates two config files in a .cryptop folder in your home directory.
 options to change the output currency (default USD), update frequency, number of decimal places to display and maximum width for float values.
 
 .cryptop/wallet.json contains the coins and amounts you hold, you shouldn't need to edit it manually
-
-adding a github gist json file under [wallet] web= in the config will allow you to read your wallet from a gist json
-now you can update your wallet.json without the application!
-
-This gist will not be possible to update however in the cryptop terminal.
 
 Credits
 -------
