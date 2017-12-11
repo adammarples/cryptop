@@ -360,9 +360,6 @@ def main():
 
     WEBWALLET = args.webwallet
     CURRENCY = args.currency
-    print (WEBWALLET)
-    print (CURRENCY)
-    sys.exit()
 
     CONFIG = read_configuration(CONFFILE)
     requests_cache.install_cache(cache_name='api_cache', backend='memory',
@@ -371,4 +368,5 @@ def main():
 
 
 if __name__ == "__main__":
+    sys.exit()
     main()
